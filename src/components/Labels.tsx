@@ -24,25 +24,31 @@ const Label: React.FC<LabelProps> = React.memo((props: LabelProps) => {
 type Props = {
   labels: types.WithState<types.Label[]>;
   onClick: (labelId: string) => void;
+  onReload: () => void;
 };
 
 const Labels: React.FC<Props> = React.memo((props: Props) => {
-  const { labels, onClick } = props;
+  const { labels, onClick, onReload } = props;
   return (
-    <div className={styles.Labels}>
-      {types.switchWithState(labels, {
-        initial: () => <div>Loading</div>,
-        loading: () => <div>Loading</div>,
-        error: () => <div>Error</div>,
-        success: (json) => (
-          <>
-            {json.map((x) => (
-              <Label label={x} onClick={onClick} key={x.id} />
-            ))}
-          </>
-        ),
-      })}
-    </div>
+    <>
+      <button type="button" onClick={onReload}>
+        Reload
+      </button>
+      <div className={styles.Labels}>
+        {types.switchWithState(labels, {
+          initial: () => <div>Loading</div>,
+          loading: () => <div>Loading</div>,
+          error: () => <div>Error</div>,
+          success: (json) => (
+            <>
+              {json.map((x) => (
+                <Label label={x} onClick={onClick} key={x.id} />
+              ))}
+            </>
+          ),
+        })}
+      </div>
+    </>
   );
 });
 

@@ -58,7 +58,11 @@ const Main: React.FC = React.memo(() => {
       <div className={styles.Header}>header</div>
       <div className={styles.Body}>
         <div className={styles.Left}>
-          <Labels labels={labels} onClick={handleLabelClick} />
+          <Labels
+            labels={labels}
+            onClick={handleLabelClick}
+            onReload={fetchAndSetLabels}
+          />
         </div>
         <div className={styles.Center}>center</div>
         <div className={styles.Right}>right</div>
