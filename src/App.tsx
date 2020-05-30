@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import FirebaseAuth from './FirebaseAuth';
@@ -11,8 +11,30 @@ const initialState: {
   user?: { displayName: string; photoUrl: string };
 } = {};
 
-function App() {
+const Debug: React.FC = () => {
+  const handleClearAccessToken = useCallback(() => {
+    resourceControl.setAccessToken('');
+  }, []);
+  const style = {
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 8,
+    margin: 16,
+    padding: 8,
+  };
+  return (
+    <div style={style}>
+      <button type="button" onClick={handleClearAccessToken}>
+        Clear AccessToken
+      </button>
+    </div>
+  );
+};
+
+const App: React.FC = () => {
   const [user, setUser] = useState(initialState.user);
+
   useMount(() => {
     (async (): Promise<void> => {
       try {
@@ -30,25 +52,36 @@ function App() {
     })();
   });
 
+  const handleReauthenticate = useCallback(async () => {
+    try {
+      const authResult = await FirebaseAuth.signIn();
+      const { accessToken } = authResult;
+      resourceControl.setAccessToken(accessToken);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   if (user === undefined) {
     return <div>認証中...</div>;
   }
 
   return (
     <Router>
+      <Debug />
       <Switch>
         <Route path="/:labelId/:messageId">
-          <Main />
+          <Main onReauthenticate={handleReauthenticate} />
         </Route>
         <Route path="/:labelId">
-          <Main />
+          <Main onReauthenticate={handleReauthenticate} />
         </Route>
         <Route>
-          <Main />
+          <Main onReauthenticate={handleReauthenticate} />
         </Route>
       </Switch>
     </Router>
   );
-}
+};
 
 export default App;

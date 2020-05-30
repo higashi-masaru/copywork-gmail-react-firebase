@@ -1,4 +1,4 @@
-export const fetchJson = async <T>(
+const fetchJson0 = async <T>(
   accessToken: string,
   input: RequestInfo
 ): Promise<
@@ -20,6 +20,19 @@ export const fetchJson = async <T>(
   }
   const json = await response.json();
   return { ok, status, json };
+};
+
+const fetchJson = async <T>(
+  accessToken: string,
+  input: RequestInfo,
+  reauthenticate: () => Promise<string>
+) => {
+  const result = await fetchJson0<T>(accessToken, input);
+  if (result.status === 401) {
+    const reAccessToken = await reauthenticate();
+    return fetchJson0<T>(reAccessToken, input);
+  }
+  return result;
 };
 
 export default {
