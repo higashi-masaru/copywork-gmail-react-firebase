@@ -1,0 +1,35 @@
+.Main {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.Header {
+  min-height: 100px;
+  max-height: 100px;
+  height: 100px;
+}
+
+.Body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.Footer {
+  height: 100px;
+}
+
+.Left {
+  background-color: #fcfcfc;
+}
+
+.Center {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.Right {
+  background-color: #fcfcfc;
+}
