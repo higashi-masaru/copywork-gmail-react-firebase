@@ -1,0 +1,9 @@
+.Labels {
+  width: 200px;
+}
+
+.Label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
