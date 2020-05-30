@@ -21,7 +21,6 @@ export default class ResourceImpl implements Resource, ResourceControl {
   labels = async (
     reauthenticate: () => Promise<void>
   ): Promise<{ labels: Label[] } | undefined> => {
-    console.log('this.accessToken', this.accessToken);
     // fetch
     const result = await Gmail.fetchJson<{
       labels: gmailv1.Schema$Label[];
