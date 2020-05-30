@@ -34,6 +34,7 @@ const Debug: React.FC = () => {
 
 const App: React.FC = () => {
   const [user, setUser] = useState(initialState.user);
+
   useMount(() => {
     (async (): Promise<void> => {
       try {
@@ -51,6 +52,16 @@ const App: React.FC = () => {
     })();
   });
 
+  const handleReauthenticate = useCallback(async () => {
+    try {
+      const authResult = await FirebaseAuth.signIn();
+      const { accessToken } = authResult;
+      resourceControl.setAccessToken(accessToken);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   if (user === undefined) {
     return <div>認証中...</div>;
   }
@@ -60,13 +71,13 @@ const App: React.FC = () => {
       <Debug />
       <Switch>
         <Route path="/:labelId/:messageId">
-          <Main />
+          <Main onReauthenticate={handleReauthenticate} />
         </Route>
         <Route path="/:labelId">
-          <Main />
+          <Main onReauthenticate={handleReauthenticate} />
         </Route>
         <Route>
-          <Main />
+          <Main onReauthenticate={handleReauthenticate} />
         </Route>
       </Switch>
     </Router>

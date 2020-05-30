@@ -7,6 +7,10 @@ import * as types from './types';
 
 import styles from './Main.module.css';
 
+type Props = {
+  onReauthenticate: () => Promise<void>;
+};
+
 const initialState: {
   labels: types.WithState<types.Label[]>;
 } = {
@@ -23,7 +27,8 @@ const useParameter = () => {
   };
 };
 
-const Main: React.FC = React.memo(() => {
+const Main: React.FC<Props> = React.memo((props: Props) => {
+  const { onReauthenticate } = props;
   const { parameter } = useParameter();
   const history = useHistory();
   console.log('parameter', parameter);
@@ -32,13 +37,13 @@ const Main: React.FC = React.memo(() => {
 
   const fetchAndSetLabels = useCallback(async () => {
     setLabels({ state: 'loading' });
-    const result = await resource.labels();
+    const result = await resource.labels(onReauthenticate);
     if (result === undefined) {
       setLabels({ state: 'error', message: 'error' });
       return;
     }
     setLabels({ state: 'success', json: result.labels });
-  }, []);
+  }, [onReauthenticate]);
 
   useMount(() => {
     // 初期ロード時

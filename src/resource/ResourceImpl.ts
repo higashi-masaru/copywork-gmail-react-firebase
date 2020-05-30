@@ -3,6 +3,7 @@ import Gmail from '../Gmail';
 
 import { Label, Resource } from '../components/Resource';
 import { ResourceControl } from './ResourceControl';
+import { switchWithState } from '../components/types';
 
 export default class ResourceImpl implements Resource, ResourceControl {
   private accessToken: string;
@@ -17,12 +18,17 @@ export default class ResourceImpl implements Resource, ResourceControl {
   };
 
   // Resource
-  labels = async (): Promise<{ labels: Label[] } | undefined> => {
+  labels = async (
+    reauthenticate: () => Promise<void>
+  ): Promise<{ labels: Label[] } | undefined> => {
     console.log('this.accessToken', this.accessToken);
     // fetch
     const result = await Gmail.fetchJson<{
       labels: gmailv1.Schema$Label[];
-    }>(this.accessToken, '/users/me/labels');
+    }>(this.accessToken, '/users/me/labels', async () => {
+      await reauthenticate();
+      return this.accessToken;
+    });
     if (result.ok === false) {
       return undefined;
     }
