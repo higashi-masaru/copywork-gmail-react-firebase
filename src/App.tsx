@@ -1,8 +1,21 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import FirebaseAuth from './FirebaseAuth';
+import { useMount } from './hooks';
 
 function App() {
+  useMount(() => {
+    (async (): Promise<void> => {
+      try {
+        await FirebaseAuth.init();
+        const authResult = await FirebaseAuth.signIn();
+        console.log('authResult', authResult);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  });
   return (
     <div className="App">
       <header className="App-header">
