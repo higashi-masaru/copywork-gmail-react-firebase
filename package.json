@@ -19,7 +19,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "lint": "eslint src/ --ext .ts,.tsx"
   },
   "eslintConfig": {
     "extends": [
@@ -30,7 +30,40 @@
       "prettier/@typescript-eslint",
       "prettier/react"
     ],
+    "settings": {
+      "import/resolver": {
+        "node": {
+          "extensions": [
+            ".js",
+            ".jsx",
+            ".ts",
+            ".tsx"
+          ]
+        }
+      }
+    },
     "rules": {
+      "import/extensions": [
+        "error",
+        "ignorePackages",
+        {
+          "js": "never",
+          "jsx": "never",
+          "ts": "never",
+          "tsx": "never"
+        }
+      ],
+      "react/jsx-filename-extension": [
+        1,
+        {
+          "extensions": [
+            ".js",
+            ".jsx",
+            ".ts",
+            ".tsx"
+          ]
+        }
+      ],
       "prettier/prettier": [
         "error",
         {
@@ -38,7 +71,12 @@
           "trailingComma": "es5"
         }
       ]
-    }  },
+    }
+  },
+  "eslintIgnore": [
+    "*.d.ts",
+    "*/serviceWorker.ts"
+  ],
   "browserslist": {
     "production": [
       ">0.2%",
