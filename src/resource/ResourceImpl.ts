@@ -1,15 +1,17 @@
 import { gmail_v1 as gmailv1 } from 'googleapis';
 import Gmail from '../Gmail';
-
 import { Label, Resource } from '../components/Resource';
 import { ResourceControl } from './ResourceControl';
-import { switchWithState } from '../components/types';
+import { Cache } from './Cache';
 
 export default class ResourceImpl implements Resource, ResourceControl {
   private accessToken: string;
 
+  private cache: Cache;
+
   constructor() {
     this.accessToken = '';
+    this.cache = {};
   }
 
   // ResourceControl
@@ -17,10 +19,18 @@ export default class ResourceImpl implements Resource, ResourceControl {
     this.accessToken = accessToken;
   };
 
+  clearCache = (): void => {
+    this.cache = {};
+  };
+
   // Resource
   labels = async (
     reauthenticate: () => Promise<void>
   ): Promise<{ labels: Label[] } | undefined> => {
+    // cache read
+    if (this.cache.labels) {
+      return { labels: this.cache.labels };
+    }
     // fetch
     const result = await Gmail.fetchJson<{
       labels: gmailv1.Schema$Label[];
@@ -36,6 +46,8 @@ export default class ResourceImpl implements Resource, ResourceControl {
     const labels = gmailLabels
       .filter((x) => x.labelListVisibility !== 'labelHide')
       .map((x) => ({ id: x.id || '', name: x.name || '' }));
+    // cache store
+    this.cache.labels = labels;
     return { labels };
   };
 }
