@@ -15,6 +15,9 @@ const Debug: React.FC = () => {
   const handleClearAccessToken = useCallback(() => {
     resourceControl.setAccessToken('');
   }, []);
+  const handleClearCache = useCallback(() => {
+    resourceControl.clearCache();
+  }, []);
   const style = {
     borderStyle: 'solid',
     borderWidth: 1,
@@ -27,6 +30,9 @@ const Debug: React.FC = () => {
     <div style={style}>
       <button type="button" onClick={handleClearAccessToken}>
         Clear AccessToken
+      </button>
+      <button type="button" onClick={handleClearCache}>
+        Clear Cache
       </button>
     </div>
   );
