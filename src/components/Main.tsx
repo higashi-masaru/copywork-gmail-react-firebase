@@ -3,6 +3,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import { useMount } from '../hooks';
 import resource from '../resource';
 import Labels from './Labels';
+import Message from './Message';
 import * as types from './types';
 
 import styles from './Main.module.css';
@@ -13,8 +14,10 @@ type Props = {
 
 const initialState: {
   labels: types.WithState<types.Label[]>;
+  message: types.WithState<types.Message>;
 } = {
   labels: { state: 'initial' },
+  message: { state: 'initial' },
 };
 
 const useParameter = () => {
@@ -34,6 +37,7 @@ const Main: React.FC<Props> = React.memo((props: Props) => {
   console.log('parameter', parameter);
 
   const [labels, setLabels] = useState(initialState.labels);
+  const [message, setMessage] = useState(initialState.message);
 
   const fetchAndSetLabels = useCallback(async () => {
     setLabels({ state: 'loading' });
@@ -44,10 +48,30 @@ const Main: React.FC<Props> = React.memo((props: Props) => {
     }
     setLabels({ state: 'success', json: result.labels });
   }, [onReauthenticate]);
+  const fetchAndSetMessage = useCallback(
+    async (arg: { messageId: string }) => {
+      const { messageId } = arg;
+      setMessage({ state: 'loading' });
+      const result = await resource.message({ messageId }, onReauthenticate);
+      if (result === undefined) {
+        setMessage({ state: 'error', message: 'error' });
+        return;
+      }
+      setMessage({ state: 'success', json: result.message });
+    },
+    [onReauthenticate]
+  );
 
   useMount(() => {
     // 初期ロード時
     fetchAndSetLabels();
+    if (parameter.messageId === undefined) {
+      // メッセージ一覧の表示
+    } else {
+      // メッセージの表示
+      const { messageId } = parameter;
+      fetchAndSetMessage({ messageId });
+    }
   });
 
   const handleLabelClick = useCallback(
@@ -69,7 +93,13 @@ const Main: React.FC<Props> = React.memo((props: Props) => {
             onReload={fetchAndSetLabels}
           />
         </div>
-        <div className={styles.Center}>center</div>
+        <div className={styles.Center}>
+          {parameter.messageId === undefined ? (
+            <>メッセージ一覧</>
+          ) : (
+            <Message message={message} />
+          )}
+        </div>
         <div className={styles.Right}>right</div>
       </div>
       <div className={styles.Footer}>footer</div>

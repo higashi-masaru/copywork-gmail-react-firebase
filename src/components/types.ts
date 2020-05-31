@@ -39,3 +39,11 @@ export type Label = {
   id: string;
   name: string;
 };
+
+export type Message = {
+  id: string;
+  from: string;
+  subject: string;
+  type: 'html' | 'text';
+  text: string;
+};
