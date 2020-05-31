@@ -3,7 +3,6 @@ import Gmail from '../Gmail';
 
 import { Label, Resource } from '../components/Resource';
 import { ResourceControl } from './ResourceControl';
-import { switchWithState } from '../components/types';
 
 export default class ResourceImpl implements Resource, ResourceControl {
   private accessToken: string;
