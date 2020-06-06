@@ -60,6 +60,35 @@ export default class ResourceImpl implements Resource, ResourceControl {
     return { labels };
   };
 
+  messageHeading = async (
+    arg: {
+      messageId: string;
+    },
+    reauthenticate: () => Promise<void>
+  ): Promise<MessageHeading | undefined> => {
+    const { messageId } = arg;
+    // cache read
+    // TODO
+    // fetch
+    const result = await Gmail.fetchJson<gmailv1.Schema$Message>(
+      this.accessToken,
+      `/users/me/messages/${messageId}?format=metadata&metadataHeaders=From&metadataHeaders=Subject`,
+      async () => {
+        await reauthenticate();
+        return this.accessToken;
+      }
+    );
+    if (result.ok === false) {
+      return undefined;
+    }
+    const gmailMessageMeta = result.json;
+    // 変換
+    const messageHeading = Gmail.parseToMessageHeading(gmailMessageMeta);
+    // cache store
+    // TODO
+    return messageHeading;
+  };
+
   messageHeadings = async (
     arg: {
       labelId: string;
@@ -67,13 +96,50 @@ export default class ResourceImpl implements Resource, ResourceControl {
     reauthenticate: () => Promise<void>
   ): Promise<{ messageHeadings: MessageHeading[] } | undefined> => {
     const { labelId } = arg;
-    const messageHeadings = [...Array(20)].map((x, i) => ({
-      id: `id${`${i}`.padStart(3, '0')}`,
-      from: `from${`${i}`.padStart(3, '0')}`,
-      subject: `subject${`${i}`.padStart(3, '0')}`,
-      snippet: `snippet${`${i}`.padStart(3, '0')}`,
-      unread: x / 2 === 0,
-    }));
+    // cache read
+    // TODO
+    // fetch
+    const maxResults = 100; // TODO
+    const result = await Gmail.fetchJson<{
+      messages: gmailv1.Schema$Message[];
+      resultSizeEstimate: number;
+      nextPageToken?: string;
+    }>(
+      this.accessToken,
+      `/users/me/messages?labelIds=${labelId}&maxResults=${maxResults}`,
+      async () => {
+        await reauthenticate();
+        return this.accessToken;
+      }
+    );
+    if (result.ok === false) {
+      return undefined;
+    }
+    const { messages: gmailMessages } = result.json;
+    // 変換
+    const messageIds = gmailMessages
+      .map((x) => x.id)
+      .filter((x): x is string => !!x);
+    const messageHeadings = (
+      await Promise.all(
+        messageIds.map((x) =>
+          this.messageHeading({ messageId: x }, reauthenticate)
+        )
+      )
+    ).map((x, i) =>
+      // TODO エラー処理
+      x === undefined
+        ? {
+            id: messageIds[i],
+            from: '',
+            subject: 'error',
+            snippet: '',
+            unread: false,
+          }
+        : x
+    );
+    // cache store
+    // TODO
     return { messageHeadings };
   };
 
