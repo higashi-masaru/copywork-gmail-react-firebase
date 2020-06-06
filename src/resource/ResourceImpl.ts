@@ -1,6 +1,11 @@
 import { gmail_v1 as gmailv1 } from 'googleapis';
 import Gmail from '../Gmail';
-import { Label, Message, Resource } from '../components/Resource';
+import {
+  Label,
+  MessageHeading,
+  Message,
+  Resource,
+} from '../components/Resource';
 import { ResourceControl } from './ResourceControl';
 import { Cache } from './Cache';
 
@@ -55,12 +60,29 @@ export default class ResourceImpl implements Resource, ResourceControl {
     return { labels };
   };
 
-  async message(
+  messageHeadings = async (
+    arg: {
+      labelId: string;
+    },
+    reauthenticate: () => Promise<void>
+  ): Promise<{ messageHeadings: MessageHeading[] } | undefined> => {
+    const { labelId } = arg;
+    const messageHeadings = [...Array(20)].map((x, i) => ({
+      id: `id${`${i}`.padStart(3, '0')}`,
+      from: `from${`${i}`.padStart(3, '0')}`,
+      subject: `subject${`${i}`.padStart(3, '0')}`,
+      snippet: `snippet${`${i}`.padStart(3, '0')}`,
+      unread: x / 2 === 0,
+    }));
+    return { messageHeadings };
+  };
+
+  message = async (
     arg: {
       messageId: string;
     },
     reauthenticate: () => Promise<void>
-  ): Promise<{ message: Message } | undefined> {
+  ): Promise<{ message: Message } | undefined> => {
     const { messageId } = arg;
     // cache read
     const cacheByMessageId = this.cache.message[messageId];
@@ -98,5 +120,5 @@ export default class ResourceImpl implements Resource, ResourceControl {
     // cache store
     this.cache.message[messageId] = resourceMessage;
     return { message };
-  }
+  };
 }

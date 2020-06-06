@@ -3,6 +3,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import { useMount } from '../hooks';
 import resource from '../resource';
 import Labels from './Labels';
+import MessageHeadings from './MessageHeadings';
 import Message from './Message';
 import * as types from './types';
 
@@ -14,9 +15,11 @@ type Props = {
 
 const initialState: {
   labels: types.WithState<types.Label[]>;
+  messageHeadings: types.WithState<types.MessageHeading[]>;
   message: types.WithState<types.Message>;
 } = {
   labels: { state: 'initial' },
+  messageHeadings: { state: 'initial' },
   message: { state: 'initial' },
 };
 
@@ -37,6 +40,9 @@ const Main: React.FC<Props> = React.memo((props: Props) => {
   console.log('parameter', parameter);
 
   const [labels, setLabels] = useState(initialState.labels);
+  const [messageHeadings, setMessageHeadings] = useState(
+    initialState.messageHeadings
+  );
   const [message, setMessage] = useState(initialState.message);
 
   const fetchAndSetLabels = useCallback(async () => {
@@ -48,6 +54,22 @@ const Main: React.FC<Props> = React.memo((props: Props) => {
     }
     setLabels({ state: 'success', json: result.labels });
   }, [onReauthenticate]);
+  const fetchAndSetMessageHeadings = useCallback(
+    async (arg: { labelId: string }) => {
+      const { labelId } = arg;
+      setMessageHeadings({ state: 'loading' });
+      const result = await resource.messageHeadings(
+        { labelId },
+        onReauthenticate
+      );
+      if (result === undefined) {
+        setMessageHeadings({ state: 'error', message: 'error' });
+        return;
+      }
+      setMessageHeadings({ state: 'success', json: result.messageHeadings });
+    },
+    [onReauthenticate]
+  );
   const fetchAndSetMessage = useCallback(
     async (arg: { messageId: string }) => {
       const { messageId } = arg;
@@ -67,6 +89,8 @@ const Main: React.FC<Props> = React.memo((props: Props) => {
     fetchAndSetLabels();
     if (parameter.messageId === undefined) {
       // メッセージ一覧の表示
+      const { labelId } = parameter;
+      fetchAndSetMessageHeadings({ labelId });
     } else {
       // メッセージの表示
       const { messageId } = parameter;
@@ -80,6 +104,14 @@ const Main: React.FC<Props> = React.memo((props: Props) => {
       history.push(`/${labelId}`);
     },
     [history]
+  );
+  const handleMessageHeadingClick = useCallback(
+    async (messageId: string) => {
+      // メッセージ見出しクリック時
+      const { labelId } = parameter;
+      history.push(`/${labelId}/${messageId}`);
+    },
+    [history, parameter]
   );
 
   return (
@@ -95,7 +127,10 @@ const Main: React.FC<Props> = React.memo((props: Props) => {
         </div>
         <div className={styles.Center}>
           {parameter.messageId === undefined ? (
-            <>メッセージ一覧</>
+            <MessageHeadings
+              messageHeadings={messageHeadings}
+              onClick={handleMessageHeadingClick}
+            />
           ) : (
             <Message message={message} />
           )}
