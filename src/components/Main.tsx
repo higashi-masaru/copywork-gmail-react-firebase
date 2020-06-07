@@ -101,7 +101,7 @@ const Main: React.FC<Props> = React.memo((props: Props) => {
   const handleLabelClick = useCallback(
     async (labelId: string) => {
       // ラベルクリック時
-      await fetchAndSetMessageHeadings({ labelId });
+      fetchAndSetMessageHeadings({ labelId });
       history.push(`/${labelId}`);
     },
     [fetchAndSetMessageHeadings, history]
@@ -110,9 +110,10 @@ const Main: React.FC<Props> = React.memo((props: Props) => {
     async (messageId: string) => {
       // メッセージ見出しクリック時
       const { labelId } = parameter;
+      fetchAndSetMessage({ messageId });
       history.push(`/${labelId}/${messageId}`);
     },
-    [history, parameter]
+    [fetchAndSetMessage, history, parameter]
   );
 
   return (
