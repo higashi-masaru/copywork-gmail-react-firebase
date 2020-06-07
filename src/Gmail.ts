@@ -168,5 +168,6 @@ const parseToMessage = (
 
 export default {
   fetchJson,
+  parseToMessageHeading,
   parseToMessage,
 };

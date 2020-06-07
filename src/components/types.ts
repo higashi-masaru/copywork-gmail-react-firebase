@@ -40,6 +40,14 @@ export type Label = {
   name: string;
 };
 
+export type MessageHeading = {
+  id: string;
+  from: string;
+  subject: string;
+  snippet: string;
+  unread: boolean;
+};
+
 export type Message = {
   id: string;
   from: string;

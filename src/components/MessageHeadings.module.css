@@ -1,0 +1,42 @@
+.MessageHeadings {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.MessageHeading {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.Unread {
+  font-weight: bold;
+}
+
+.From {
+  min-width: 200px;
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.SubjectSnippet {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.Subject {
+  flex-grow: 1;
+}
+
+.Snippet {
+  margin-left: 10px;
+  color: silver;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
